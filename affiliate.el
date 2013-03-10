@@ -32,6 +32,26 @@ member of all of the supported affiliate programs."
   :type 'boolean
   :group 'affiliate)
 
+
+(defun aff-transform-url (url &optional merchant)
+  "Rewrites URL to include an affiliate ID.
+
+If MERCHANT is provided, we trust that extra information and processes the URL
+as a link to MERCHANT without examining it. Otherwise, we examine URL and
+deduce MERCHANT from the domain name.
+
+Returns the new version of URL if and only if we can positively identify which
+merchant it matches and generate a well-formed affiliate link. Otherwise,
+returns URL unchanged."
+  (let ((merchant (or merchant (aff-guess-merchant url))))
+    (cond
+     ((eq merchant 'amazon) (aff-make-amazon-link url))
+     ((eq merchant 'itunes) (aff-make-itunes-link url))
+     ((eq merchant 'apple-appstore (aff-make-apple-appstore-link url)))
+     (t (when aff-verbosity
+          (message "Can't match the URL [%s] to a known affiliate program." url))
+        url))))
+
 (defun aff-replace-urls-in-region (start end &optional restrict-to-domains)
   ;; go through the region and replace every link you can with an affiliate
   ;; version of itself.
@@ -48,26 +68,6 @@ member of all of the supported affiliate programs."
       (switch-to-buffer target-buffer))
     (aff-replace-urls-in-region (point-min) (point-max))))
 
-(defun aff-investigate-string ()
-  (error "Not yet implemented!"))
-
-(defun aff-find-urls (text-blob)
-  (error "Not yet implemented!"))
-
-(defun aff-transform-url (url &optional merchant)
-  ;; attempt to guess store ID from domain name in URL
-  "Generate a link for STORE with my affiliate code from URL.
-
-If STORE is in the list of known stores, this function examines URL and returns
-a string with a URL that identifies the same product, but with my affiliate
-code attached. If STORE is not known, returns nil. If the function can't figure
-out how to generate the right kind of URL to return, it should return the
-original URL."
-  (let ((merchant (or merchant (aff-guess-merchant url))))
-    (cond
-     ((string-equal merchant "amazon") (make-amazon-aff-link url))
-     ((string-equal merchant "itunes") (make-itunes-aff-link url))
-     (t (error "Don't know a store named '%s'." (pp-to-string store))))))
 (defun aff-guess-merchant (url)
   "Looks at the start of URL, matches it to a merchant."
   (cond
@@ -77,6 +77,9 @@ original URL."
    ((string-match
      "^\\(\\(https?\\|itms\\|itms-apps\\)://\\)?\\((itunes\\|phobos\\)\\.apple\\.com/[a-z]\\{2\\}/"
      url) 'itunes)
+   ((string-match
+     "^\\(https?://\\)?\\(www\\.\\)?appstore\\.com/"
+     url) 'apple-appstore)
    (t 'unknown)))
 
 (defun aff-canonicalize-url (url)
