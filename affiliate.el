@@ -110,6 +110,41 @@ URL must be something blessed by `aff-guess-merchant': otherwise
   "Docstring"
   (error "Not yet implemented!"))
 
+(defun aff-dissect-itunes-url (url)
+  "Retrives content, content-type, and country identifiers from URL.
+
+Returns a list like:
+
+  (content-id content-type country-id)
+
+For more on the structure of iTunes Store URLs, see:
+
+* http://stackoverflow.com/q/433907/244494
+* https://developer.apple.com/library/ios/#qa/qa2008/qa1629.html
+* https://developer.apple.com/library/ios/#qa/qa1633/_index.html
+* http://itunes.apple.com/linkmaker/
+* http://www.apple.com/itunes/affiliates/resources/
+
+The US iTunes Store operates its affiliate program through Rakuten LinkShare:
+other regions may operate through other affiliate programs. The iTunes-related
+functions may later be split into region-specific functions to reflect this."
+  (string-match
+   (concat "^\\(?:\\(https?\\|itms\\|itms-apps\\)://\\)?\\((?:itunes\\|phobos\\)\\.apple\\.com/"
+           "\\([a-z]\\{2\\}\\)/" ;; country code
+           "\\([a-z]+\\)/" ;; content type e.g. album, app, artist
+           "[^/]+/" ;; human-readable content name
+           "\\(id[[:digit:]]+\\)" ;; content identifier
+           "\\(.*?$\\)") ;; Possible trailing query-string gunk
+   url)
+  (when (match-string 0)
+      (let* ((content-id (match-string 3))
+             (content-type (match-string 2))
+             (country-id (match-string 1))
+             (detritus (match-string 4)))
+        (when aff-verbosity
+          (message "Found trailing detritus in query string: [%s]" detritus))
+        (list content-id content-type country-id))))
+
 (defun aff-dissect-apple-appstore-url (url)
   (error "Not yet implemented!"))
 
