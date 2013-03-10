@@ -22,6 +22,16 @@
           :tag "iTunes Store Affiliate ID")
   :group 'affiliate)
 
+(defcustom aff-verbosity
+  t
+  "Whether or not `affiliate.el' warns you about unset affiliate IDs.
+
+When nil, no messages about missing affiliate IDs will be emitted
+- this may be desireable after initial setup if you're not a
+member of all of the supported affiliate programs."
+  :type 'boolean
+  :group 'affiliate)
+
 (defun aff-replace-urls-in-region (start end &optional restrict-to-domains)
   ;; go through the region and replace every link you can with an affiliate
   ;; version of itself.
