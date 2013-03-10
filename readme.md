@@ -26,10 +26,12 @@ Usage
 * The minimum-effort way to operate this package is to add
   `aff-replace-urls-in-buffer` to the `before-save-hook` hooks. You'll probably
   want to restrict it to specific modes. Example:
-  > (add-hook 'before-save-hook
-  >   (lambda ()
-  >     (when (member major-mode '(markdown-mode text-mode))
-  >       (aff-replace-urls-in-buffer))))
+  ```elisp
+  (add-hook 'before-save-hook
+     (lambda ()
+       (when (member major-mode '(markdown-mode text-mode))
+         (aff-replace-urls-in-buffer))))
+  ```
 
 License
 =======
