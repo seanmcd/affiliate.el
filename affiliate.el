@@ -1,29 +1,21 @@
 ;; init-affiliate.el
 
-;; Currently only supports iTunes and Amazon affiliate links, but those are the
-;; biggest anyhow, so that's fine to start with.
-
+;; Configuration variables.
 (defgroup affiliate nil
   "Affiliate link creation and editing."
-  :prefix "aff-"
-  :group 'external)
+  :prefix "aff-" :group 'external)
 
-(defcustom aff-itunes-id
-  ""
-  "Affiliate ID to use for links to the iTunes Store."
-  :type '(string
-          :tag "iTunes Store Affiliate ID")
-  :group 'affiliate)
-
-(defcustom aff-amazon-id
-  ""
+(defcustom aff-amazon-id ""
   "Affiliate ID to use for links to Amazon."
-  :type '(string
-          :tag "iTunes Store Affiliate ID")
+  :type '(string :tag "Amazon Affiliate ID")
   :group 'affiliate)
 
-(defcustom aff-verbosity
-  t
+(defcustom aff-itunes-id ""
+  "Affiliate ID to use for links to the iTunes Store."
+  :type '(string :tag "iTunes Store Affiliate ID")
+  :group 'affiliate)
+
+(defcustom aff-verbosity t
   "Whether or not `affiliate.el' warns you about unset affiliate IDs.
 
 When nil, no messages about missing affiliate IDs will be emitted
@@ -71,6 +63,7 @@ returns URL unchanged."
       (switch-to-buffer target-buffer))
     (aff-replace-urls-in-region (point-min) (point-max))))
 
+
 ;; Implementation details.
 (defun aff-guess-merchant (url)
   "Looks at the start of URL, matches it to a merchant."
@@ -85,6 +78,7 @@ returns URL unchanged."
      "^\\(https?://\\)?\\(www\\.\\)?appstore\\.com/"
      url) 'apple-appstore)
    (t 'unknown)))
+
 
 (defun aff-make-amazon-link (url)
   (error "Not yet implemented!"))
@@ -105,6 +99,7 @@ URL must be something blessed by `aff-guess-merchant': otherwise
 
 (defun aff-make-apple-appstore-link (url)
   (error "Not yet implemented!"))
+
 
 (defun aff-dissect-amazon-url (url)
   "Docstring"
@@ -147,16 +142,6 @@ functions may later be split into region-specific functions to reflect this."
 
 (defun aff-dissect-apple-appstore-url (url)
   (error "Not yet implemented!"))
-
-(defun aff-make-amazon-link (url)
-  (error "Not yet implemented!"))
-
-(defun aff-make-itunes-link (url)
-  (error "Not yet implemented!"))
-
-(defun aff-make-apple-appstore-link (url)
-  (error "Not yet implemented!"))
-
 
 
 (provide 'affiliate)
