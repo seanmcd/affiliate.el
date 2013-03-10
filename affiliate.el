@@ -68,9 +68,16 @@ original URL."
      ((string-equal merchant "amazon") (make-amazon-aff-link url))
      ((string-equal merchant "itunes") (make-itunes-aff-link url))
      (t (error "Don't know a store named '%s'." (pp-to-string store))))))
-
 (defun aff-guess-merchant (url)
-  (error "Not yet implemented!"))
+  "Looks at the start of URL, matches it to a merchant."
+  (cond
+   ((string-match
+     "^\\(https?://\\)?\\((www\\.\\)?amazon\\.\\(com\\|ca\\|cn\\|fr\\|de\\|it\\|co\\.jp\\|es\\|co\\.uk\\)/"
+     url) 'amazon)
+   ((string-match
+     "^\\(\\(https?\\|itms\\|itms-apps\\)://\\)?\\((itunes\\|phobos\\)\\.apple\\.com/[a-z]\\{2\\}/"
+     url) 'itunes)
+   (t 'unknown)))
 
 (defun aff-canonicalize-url (url)
   ;; twiddle an URL into an unambiguous form so that we know what we're dealing with.
