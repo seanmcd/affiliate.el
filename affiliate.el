@@ -86,12 +86,14 @@ returns URL unchanged."
   ;; twiddle an URL into an unambiguous form so that we know what we're dealing with.
   (error "Not yet implemented!"))
 
-(defun make-amazon-aff-link (url)
+(defun aff-make-amazon-link (url)
   (error "Not yet implemented!"))
 
-(defun make-itunes-aff-link (url)
+(defun aff-make-itunes-link (url)
   (error "Not yet implemented!"))
 
+(defun aff-make-apple-appstore-link (url)
+  (error "Not yet implemented!"))
 
 
 
