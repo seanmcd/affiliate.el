@@ -11,6 +11,10 @@ iTunes Store and to Amazon. They're the two biggest affiliate programs. If I
 join other affiliate programs or get pull requests implementing them, those
 will show up here.
 
+Accomplishments large or small are never truly gained alone. This one in
+particular would have been ten times harder if it weren't for Stack
+Overflow. I'm grateful that it exists.
+
 Usage
 =====
 
