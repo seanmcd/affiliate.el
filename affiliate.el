@@ -80,15 +80,20 @@ returns URL unchanged."
    (t 'unknown)))
 
 
+;; The `aff-make-foo-link' family of functions *will* produce garbage results
+;; if you feed them arbitrary strings instead of something that has been or
+;; would be blessed by `aff-guess-merchant'.
 (defun aff-make-amazon-link (url)
-  (error "Not yet implemented!"))
+  "Turn Amazon link URL into affiliate-linked URL."
+  (multiple-value-bind
+      (asin country-tld)
+      (aff-dissect-amazon-url url)
+    (format
+     "https://www.amazon.%s/dp/%s/"
+     country-tld asin)))
 
 (defun aff-make-itunes-link (url)
-  "Turn iTunes Store link URL into an affiliate-linked URL.
-
-URL must be something blessed by `aff-guess-merchant': otherwise
-`aff-dissect-itunes-url' will return nil and this function's invocation of
-`multiple-value-bind' will throw an error."
+  "Turn iTunes Store link URL into an affiliate-linked URL."
   (multiple-value-bind
       (content-id content-type country-id)
       (aff-dissect-itunes-url url)
@@ -129,9 +134,9 @@ URL, and when handed an amazon.com URL, will return an amazon.com URL."
     "\\([A-Z0-9]\\{10\\}\\)"           ;; The actual ASIN.
     "/?.*$"))                          ;; Trailing query-string gunk
   (if (match-string 0)
-    (let ((country-tld (match-string 1))
-          (asin (match-string 2)))
-      (list asin country-tld))
+      (let ((country-tld (match-string 1))
+            (asin (match-string 2)))
+        (list asin country-tld))
     (when aff-verbosity
       (message "Couldn't process [%s] as an Amazon URL." url))))
 
