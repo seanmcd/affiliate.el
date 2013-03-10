@@ -33,6 +33,7 @@ member of all of the supported affiliate programs."
   :group 'affiliate)
 
 
+;; Interactive functions; user-facing, stable.
 (defun aff-transform-url (url &optional merchant)
   "Rewrites URL to include an affiliate ID.
 
@@ -43,6 +44,7 @@ deduce MERCHANT from the domain name.
 Returns the new version of URL if and only if we can positively identify which
 merchant it matches and generate a well-formed affiliate link. Otherwise,
 returns URL unchanged."
+  (interactive "sURL to add affiliate code to: ")
   (let ((merchant (or merchant (aff-guess-merchant url))))
     (cond
      ((eq merchant 'amazon) (aff-make-amazon-link url))
@@ -52,10 +54,10 @@ returns URL unchanged."
           (message "Can't match the URL [%s] to a known affiliate program." url))
         url))))
 
-(defun aff-replace-urls-in-region (start end &optional restrict-to-domains)
+(defun aff-replace-urls-in-region (start end)
   ;; go through the region and replace every link you can with an affiliate
   ;; version of itself.
-  (interactive)
+  (interactive "r")
   (save-excursion
     ;; crawl forward until you find a URL, tinker with it, then go to next, repeat.
     (error "Not yet implemented!")))
@@ -63,11 +65,13 @@ returns URL unchanged."
 (defun aff-replace-urls-in-buffer (&optional target-buffer)
   ;; call aff-replace-urls-in-region but just use point-min and point-max for args.
   ;; if BUFFER is provided, do the fiddling-about in that buffer, otherwise, current.
+  (interactive "bAdd affiliate code to URLs in this buffer: ")
   (save-excursion
     (when target-buffer
       (switch-to-buffer target-buffer))
     (aff-replace-urls-in-region (point-min) (point-max))))
 
+;; Implementation details.
 (defun aff-guess-merchant (url)
   "Looks at the start of URL, matches it to a merchant."
   (cond
