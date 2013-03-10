@@ -86,8 +86,31 @@ returns URL unchanged."
      url) 'apple-appstore)
    (t 'unknown)))
 
-(defun aff-canonicalize-url (url)
-  ;; twiddle an URL into an unambiguous form so that we know what we're dealing with.
+(defun aff-make-amazon-link (url)
+  (error "Not yet implemented!"))
+
+(defun aff-make-itunes-link (url)
+  "Turn iTunes Store link URL into an affiliate-linked URL.
+
+URL must be something blessed by `aff-guess-merchant': otherwise
+`aff-dissect-itunes-url' will return nil and this function's invocation of
+`multiple-value-bind' will throw an error."
+  (multiple-value-bind
+      (content-id content-type country-id)
+      (aff-dissect-itunes-url url)
+    ;; example: http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8
+    (format
+     "https://itunes.apple.com/%s/%s/%s?partnerId=30&siteID=%s"
+     country-id content-type content-id aff-itunes-id)))
+
+(defun aff-make-apple-appstore-link (url)
+  (error "Not yet implemented!"))
+
+(defun aff-dissect-amazon-url (url)
+  "Docstring"
+  (error "Not yet implemented!"))
+
+(defun aff-dissect-apple-appstore-url (url)
   (error "Not yet implemented!"))
 
 (defun aff-make-amazon-link (url)
