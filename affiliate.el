@@ -1,3 +1,4 @@
+;; -*- coding: utf-8 -*-
 ;; init-affiliate.el
 
 ;; Configuration variables.
