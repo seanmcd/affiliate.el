@@ -58,57 +58,25 @@ returns URL unchanged."
   ;; of puts the code in the /stuff part instead of the domain.tld part.
   (interactive "r")
   (save-excursion
+    (let ((found-url-list) '())
     (goto-char start)
     (while (< (point) end)
-      (search-forward-regexp
-       ;; Adapted from http://daringfireball.net/2010/07/improved_regex_for_matching_urls
+        (when (search-forward-regexp
        (concat "\\b\\(" ;; start on word boundary, begin group for whole URL
                "\\(?:https?://\\)?" ;; Optional protocol specifier
                "\\(?:www[[:digit:]]\\{0,3\\}\\.\\)?" ;; "www.", "www2.", etc.
                "[a-zA-Z0-9.-]+\\.[a-z]\\{2,4\\}" ;; won't match ".museum" TLDs. shrug.
-               ;; (?:                       # One or more:
-               "/\\(?:"
-               ;;   [^\s()<>]+                  # Run of non-space, non-()<>
-               "[^[:space:]()<>]+"
-               ;;   |                      #   or balanced parens, up to 2 levels
-               "\\|"
-               ;;   \( # literal open paren A(
-               "("
-               ;;     ([^\s()<>]+
-               "\\(?:[^[:space:]()<>]+" ;; a path segment that starts with a (, or
-               ;;     |
-               "\\|"
-               ;;       (
-               "\\("
-               ;;         \([^\s()<>]+\) # literal open paren B(, literal close paren B)
-               "([^[:space:]()<>]+)"
-               ;;       )
+                       "/[][a-zA-Z0-9-._~:/?#@!$˘)*+,;=]+"    ;; match a run of normal URL characters
+                       "[^][[:space:]`!(){};:'\".,<>?«»“”‘’]" ;; ending with something non-punctuation-y
                "\\)"
-               ;;     )*
-               "\\)*"
-               ;;   \) # literal close paren A)
-               ")"
-               ;; )+
-               "\\)+"
-               ;; (?:                       # End with:
-               "\\(?:"
-               ;;   \(([^\s()<>]+|
-               "(\\(?:[^[:space:]()<>]+\\|"
-               ;; (\([^\s()<>]+\)
-               "\\(?:([^[:space:]()<>]+)"
-               ;; ))*\)  # balanced parens, up to 2 levels
-               "\\)\\)*)"
-               ;;   |                               #   or
-               "\\|"
-               ;;   [^\s`!()\[\]{};:'".,<>?«»“”‘’]        # not a space or one of these punct chars
-               "[^][[:space:]`!(){};:'\".,<>?«»“”‘’]"
-               ;; )
-               "\\)")
-       end 'move-to-end) ;; failing the search should break us out of the while loop.
-      (when (match-string 0)
-        (let ((new-url (aff-transform-url (match-string 1))))
-          (replace-match new-url)
-          new-url)))))
+                       ;; followed something that's probably not part of an URL.
+                       "\\(?:[][[:space:]`!(){};:'\".,<>?«»“”‘’]\\|\\b\\|$\\)")
+               end 'move-to-limit) ;; failing the search breaks us out of the while loop and returns nil.
+          (let* ((found-url (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
+                 (new-url (aff-transform-url found-url)))
+            (replace-match new-url nil t nil 1)
+            (setq found-url-list (cons found-url found-url-list)))))
+      found-url-list)))
 
 (defun aff-replace-urls-in-buffer (&optional target-buffer)
   ;; call aff-replace-urls-in-region but just use point-min and point-max for args.
