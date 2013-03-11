@@ -59,16 +59,16 @@ returns URL unchanged."
   (interactive "r")
   (save-excursion
     (let ((found-url-list) '())
-    (goto-char start)
-    (while (< (point) end)
+      (goto-char start)
+      (while (< (point) end)
         (when (search-forward-regexp
-       (concat "\\b\\(" ;; start on word boundary, begin group for whole URL
-               "\\(?:https?://\\)?" ;; Optional protocol specifier
-               "\\(?:www[[:digit:]]\\{0,3\\}\\.\\)?" ;; "www.", "www2.", etc.
-               "[a-zA-Z0-9.-]+\\.[a-z]\\{2,4\\}" ;; won't match ".museum" TLDs. shrug.
-                       "/[][a-zA-Z0-9-._~:/?#@!$˘)*+,;=]+"    ;; match a run of normal URL characters
+               (concat "\\b\\(" ;; start on word boundary, begin group for whole URL
+                       "\\(?:https?://\\)?" ;; Optional protocol specifier
+                       "\\(?:www[[:digit:]]\\{0,3\\}\\.\\)?"  ;; "www.", "www2.", etc.
+                       "[a-zA-Z0-9.-]+\\.[a-z]\\{2,4\\}"      ;; won't match ".museum" TLDs. shrug.
+                       "/[][a-zA-Z0-9-._~:/?#@!$)(*+,;=]+"    ;; match a run of normal URL characters
                        "[^][[:space:]`!(){};:'\".,<>?«»“”‘’]" ;; ending with something non-punctuation-y
-               "\\)"
+                       "\\)"
                        ;; followed something that's probably not part of an URL.
                        "\\(?:[][[:space:]`!(){};:'\".,<>?«»“”‘’]\\|\\b\\|$\\)")
                end 'move-to-limit) ;; failing the search breaks us out of the while loop and returns nil.
