@@ -50,10 +50,65 @@ returns URL unchanged."
 (defun aff-replace-urls-in-region (start end)
   ;; go through the region and replace every link you can with an affiliate
   ;; version of itself.
+
+  ;; Attempts to find *all* URLs as future-proofing. Deciding whether an URL is
+  ;; something we care about or not, is for other functions.
+
+  ;; only matches domain.tld/stuff/ URLs because every affiliate program I know
+  ;; of puts the code in the /stuff part instead of the domain.tld part.
   (interactive "r")
   (save-excursion
-    ;; crawl forward until you find a URL, tinker with it, then go to next, repeat.
-    (error "Not yet implemented!")))
+    (goto-char start)
+    (while (< (point) end)
+      (search-forward-regexp
+       ;; Adapted from http://daringfireball.net/2010/07/improved_regex_for_matching_urls
+       (concat "\\b\\(" ;; start on word boundary, begin group for whole URL
+               "\\(?:https?://\\)?" ;; Optional protocol specifier
+               "\\(?:www[[:digit:]]\\{0,3\\}\\.\\)?" ;; "www.", "www2.", etc.
+               "[a-zA-Z0-9.-]+\\.[a-z]\\{2,4\\}" ;; won't match ".museum" TLDs. shrug.
+               ;; (?:                       # One or more:
+               "/\\(?:"
+               ;;   [^\s()<>]+                  # Run of non-space, non-()<>
+               "[^[:space:]()<>]+"
+               ;;   |                      #   or balanced parens, up to 2 levels
+               "\\|"
+               ;;   \( # literal open paren A(
+               "("
+               ;;     ([^\s()<>]+
+               "\\(?:[^[:space:]()<>]+" ;; a path segment that starts with a (, or
+               ;;     |
+               "\\|"
+               ;;       (
+               "\\("
+               ;;         \([^\s()<>]+\) # literal open paren B(, literal close paren B)
+               "([^[:space:]()<>]+)"
+               ;;       )
+               "\\)"
+               ;;     )*
+               "\\)*"
+               ;;   \) # literal close paren A)
+               ")"
+               ;; )+
+               "\\)+"
+               ;; (?:                       # End with:
+               "\\(?:"
+               ;;   \(([^\s()<>]+|
+               "(\\(?:[^[:space:]()<>]+\\|"
+               ;; (\([^\s()<>]+\)
+               "\\(?:([^[:space:]()<>]+)"
+               ;; ))*\)  # balanced parens, up to 2 levels
+               "\\)\\)*)"
+               ;;   |                               #   or
+               "\\|"
+               ;;   [^\s`!()\[\]{};:'".,<>?«»“”‘’]        # not a space or one of these punct chars
+               "[^][[:space:]`!(){};:'\".,<>?«»“”‘’]"
+               ;; )
+               "\\)")
+       end 'move-to-end) ;; failing the search should break us out of the while loop.
+      (when (match-string 0)
+        (let ((new-url (aff-transform-url (match-string 1))))
+          (replace-match new-url)
+          new-url)))))
 
 (defun aff-replace-urls-in-buffer (&optional target-buffer)
   ;; call aff-replace-urls-in-region but just use point-min and point-max for args.
