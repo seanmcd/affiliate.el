@@ -58,3 +58,12 @@
      ("http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8" . itunes)
      ("http://www.amazon.com/The-Emacs-Lisp-Reference-Manual/dp/188211440X" . amazon))))
 
+(ert-deftest aff-dissect-amazon-url-asin ()
+  "Tests whether function correctly identifies ASINs in URLs."
+  (mapcar
+   (lambda (pair) (should (equal (cdr pair) (car (aff-dissect-amazon-url (car pair))))))
+   '(("http://www.amazon.com/gp/product/006097625X" . "006097625X")
+     ("http://www.amazon.com/Lisp-Advanced-Techniques-Common/dp/0130305529/ref=sr_1_1?s=books&ie=UTF8&qid=1349897609&sr=1-1&keywords=on+lisp" . "0130305529")
+     ("http://www.amazon.com/dp/1435712757/ref=pd_sim_b_2" . "1435712757")
+     ("http://www.amazon.com/Practical-Common-Lisp-first-Text/dp/B004T91X0E/ref=tmm_hrd_title_2" . "B004T91X0E")
+     ("http://www.amazon.com/o/ASIN/B00746LVOM/ref=sr_1_1?ie=UTF8&qid=1349897747&sr=8-1&keywords=apple+ipad" . "B00746LVOM"))))

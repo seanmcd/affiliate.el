@@ -151,19 +151,19 @@ URL it finds an ASIN in, is a reliable indicator of which country's Amazon
 store that ASIN is intended to refer to and preserve the country TLD: i.e. when
 this function is handed an amazon.co.jp URL, it will return an amazon.co.jp
 URL, and when handed an amazon.com URL, will return an amazon.com URL."
-  (string-match
-   ;; Bug: won't match the http://amzn.com/$ASIN style of URL.
-   (concat
-    "^\\(?:https?://\\)?\\(?:www\\.\\)?amazon\\.\\(com\\|ca\\|cn\\|fr\\|de\\|it\\|co\\.jp\\|es\\|co\\.uk\\)/"
-    "\\(?:exec/obidos/tg/detail/-/\\|" ;; Amazon has used several
-    "o/ASIN/\\|"                       ;; URL schemes over time.
-    "[dg]p/\\(?:product/\\)?\\|"
-    "[a-zA-Z0-9][^/]+/dp/\\)"
-    "\\([A-Z0-9]\\{10\\}\\)"           ;; The actual ASIN.
-    "/?.*$"))                          ;; Trailing query-string gunk
-  (if (match-string 0)
-      (let ((country-tld (match-string 1))
-            (asin (match-string 2)))
+  (if (string-match
+       ;; Bug: won't match the http://amzn.com/$ASIN style of URL.
+       (concat "^\\(?:https?://\\)?\\(?:www\\.\\)?amazon\\."
+               "\\(com\\|ca\\|cn\\|fr\\|de\\|it\\|co\\.jp\\|es\\|co\\.uk\\)/"
+               "\\(?:exec/obidos/tg/detail/-/\\|" ;; Amazon has used several
+               "o/ASIN/\\|"                       ;; URL schemes over time.
+               "[dg]p/\\(?:product/\\)?\\|"
+               "[a-zA-Z0-9][^/]+/dp/\\)"
+               "\\([A-Z0-9]\\{10\\}\\)"           ;; The actual ASIN.
+               "/?.*$")                           ;; Trailing query-string gunk
+       url)
+      (let ((country-tld (match-string 1 url))
+            (asin (match-string 2 url)))
         (list asin country-tld))
     (when aff-verbosity
       (message "Couldn't process [%s] as an Amazon URL." url))))
@@ -186,19 +186,19 @@ For more on the structure of iTunes Store URLs, see:
 The US iTunes Store operates its affiliate program through Rakuten LinkShare:
 other regions may operate through other affiliate programs. The iTunes-related
 functions may later be split into region-specific functions to reflect this."
-  (string-match
-   (concat "^\\(?:\\(https?\\|itms\\|itms-apps\\)://\\)?\\(?:itunes\\|phobos\\)\\.apple\\.com/"
-           "\\([a-z]\\{2\\}\\)/" ;; country code
-           "\\([a-z]+\\)/" ;; content type e.g. album, app, artist
-           "[^/]+/" ;; human-readable content name
-           "\\(id[[:digit:]]+\\)" ;; content identifier
-           "\\(.*?$\\)") ;; Possible trailing query-string gunk
-   url)
-  (if (match-string 0)
-      (let* ((content-id (match-string 3))
-             (content-type (match-string 2))
-             (country-id (match-string 1))
-             (detritus (match-string 4)))
+  (if (string-match
+       (concat "^\\(?:\\(https?\\|itms\\|itms-apps\\)://\\)?"
+               "\\(?:itunes\\|phobos\\)\\.apple\\.com/"
+               "\\([a-z]\\{2\\}\\)/" ;; country code
+               "\\([a-z]+\\)/" ;; content type e.g. album, app, artist
+               "[^/]+/" ;; human-readable content name
+               "\\(id[[:digit:]]+\\)" ;; content identifier
+               "\\(.*?$\\)") ;; Possible trailing query-string gunk
+       url)
+      (let* ((content-id (match-string 3 url))
+             (content-type (match-string 2 url))
+             (country-id (match-string 1 url))
+             (detritus (match-string 4 url)))
         (when aff-verbosity
           (message "Found trailing detritus in query string: [%s]" detritus))
         (list content-id content-type country-id))
