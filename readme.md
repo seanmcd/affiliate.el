@@ -37,6 +37,13 @@ Usage
          (aff-replace-urls-in-buffer))))
   ```
 
+* The moderately effortful way to operate this package is to call `M-x
+  aff-replace-urls-in-buffer` by hand, to select a region and call `M-x
+  aff-replace-urls-in-region`, or to micromanage and call `M-x
+  aff-transform-url` and provide an URL in the minibuffer when prompted. The
+  in-buffer and in-region commands will alter the contents of the buffer, but
+  the transform-url command will just display its result without inserting it.
+
 License
 =======
 

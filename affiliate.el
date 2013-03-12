@@ -17,11 +17,13 @@
   :group 'affiliate)
 
 (defcustom aff-verbosity t
-  "Whether or not `affiliate.el' warns you about unset affiliate IDs.
+  "Whether or not to emit messages about operation.
 
-When nil, no messages about missing affiliate IDs will be emitted
-- this may be desireable after initial setup if you're not a
-member of all of the supported affiliate programs."
+When non-nil, will emit grumblings to the *Messages buffer about unset
+affiliate IDs, URLs that can't be matched to an affiliate program, URLs that
+already contain an affiliate ID, etc. After initial setup, you may went to
+change this to nil if you're not a member of all of the supported affiliate
+programs."
   :type 'boolean
   :group 'affiliate)
 
@@ -48,20 +50,22 @@ returns URL unchanged."
         url))))
 
 (defun aff-replace-urls-in-region (start end)
-  ;; go through the region and replace every link you can with an affiliate
-  ;; version of itself.
+  "Scans for URLs between START and END, sends them to `aff-transform-url'.
 
-  ;; Attempts to find *all* URLs as future-proofing. Deciding whether an URL is
-  ;; something we care about or not, is for other functions.
-
-  ;; only matches domain.tld/stuff/ URLs because every affiliate program I know
-  ;; of puts the code in the /stuff part instead of the domain.tld part.
+Called interactively, operates on the region. Called from lisp, operates on the
+region given by its arguments. Returns a list of URLs found in the given
+region, and as a side effect, does any affiliate-code-adding that it
+can. Intended to operate idempotently - if you run this twice in a row on the
+same block of text and the second run changes something the first didn't, there
+is a bug."
   (interactive "r")
   (save-excursion
     (let ((found-url-list) '())
       (goto-char start)
       (while (< (point) end)
         (when (search-forward-regexp
+               ;; only matches domain.tld/stuff/ URLs because every affiliate program I know
+               ;; of puts the code in the /stuff part instead of the domain.tld part.
                (concat "\\b\\(" ;; start on word boundary, begin group for whole URL
                        "\\(?:https?://\\)?" ;; Optional protocol specifier
                        "\\(?:www[[:digit:]]\\{0,3\\}\\.\\)?"  ;; "www.", "www2.", etc.
@@ -69,7 +73,7 @@ returns URL unchanged."
                        "/[][a-zA-Z0-9-._~:/?#@!$)(*+,;=]+"    ;; match a run of normal URL characters
                        "[^][[:space:]`!(){};:'\".,<>?«»“”‘’]" ;; ending with something non-punctuation-y
                        "\\)"
-                       ;; followed something that's probably not part of an URL.
+                       ;; followed by something that's probably not part of an URL.
                        "\\(?:[][[:space:]`!(){};:'\".,<>?«»“”‘’]\\|\\b\\|$\\)")
                end 'move-to-limit) ;; failing the search breaks us out of the while loop and returns nil.
           (let* ((found-url (buffer-substring-no-properties (match-beginning 1) (match-end 1)))
