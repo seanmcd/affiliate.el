@@ -52,9 +52,9 @@
 
 (ert-deftest aff-guess-merchant ()
   "Tests whether `aff-guess-merchant' correctly identifies merchant in input."
-  (should (equal 'unknown
-                 (aff-guess-merchant "empty or not an URL")))
-  (should (equal 'itunes
-                 (aff-guess-merchant "http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8")))
-  (should (equal 'amazon
-                 (aff-guess-merchant "http://www.amazon.com/The-Emacs-Lisp-Reference-Manual/dp/188211440X"))))
+  (mapcar
+   (lambda (pair) (should (equal (cdr pair) (aff-guess-merchant (car pair)))))
+   '(("empty or not an URL" . unknown)
+     ("http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8" . itunes)
+     ("http://www.amazon.com/The-Emacs-Lisp-Reference-Manual/dp/188211440X" . amazon))))
+
