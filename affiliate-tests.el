@@ -12,14 +12,11 @@
          (scrutinize-pair (pair)
            (let ((haystack (car pair))
                  (needle (cdr pair)))
-             (message "Searching for [%s] in [%s] ..." needle haystack)
              (with-temp-buffer
                (insert haystack)
                (goto-char (point-min))
                (let ((needles-found
                       (aff-replace-urls-in-region (point-min) (point-max))))
-                 (message "post-search haystack: [%s]."
-                          (buffer-substring-no-properties (point-min) (point-max)))
                  (should (equal needles-found needle)))))))
     (mapcar
      #'scrutinize-pair
@@ -36,6 +33,19 @@
        ("http://www.extinguishedscholar.com/wpglob/?p=364." . ("http://www.extinguishedscholar.com/wpglob/?p=364"))
        ("http://example.com/something?with,commas,in,url, but not at end" . ("http://example.com/something?with,commas,in,url"))
        ("can it find a bit.ly/foo url?" . ("bit.ly/foo"))
+       ("<tag>http://example.com/path_path</tag>" . ("http://example.com/path_path"))
        ("“is.gd/foo/”" . ("is.gd/foo/"))
-       ("http://www.asianewsphoto.com/(S(neugxif4twuizg551ywh3f55))/Web_ENG/View_DetailPhoto.aspx?PicId=752" . ("http://www.asianewsphoto.com/(S(neugxif4twuizg551ywh3f55))/Web_ENG/View_DetailPhoto.aspx?PicId=752"))))))
-
+       ("http://www.asianewsphoto.com/(S(neugxif4twuizg551ywh3f55))/Web_ENG/View_DetailPhoto.aspx?PicId=752" . ("http://www.asianewsphoto.com/(S(neugxif4twuizg551ywh3f55))/Web_ENG/View_DetailPhoto.aspx?PicId=752"))
+       ;; Non-encoded non-ASCII characters are not matched.
+       ("www.c.ws/䨹" . nil)
+       ;; Domain names with no path component are not matched.
+       ("Just a www.example.com link." . nil)
+       ("<tag>http://example.com</tag>" . nil)
+       ;; Not all three-letter extensions are domain names.
+       ("The phrase filename.txt is not a domain name." . nil)
+       ;; Will not match "raw" IDNs correctly, but should match Punycode IDNs.
+       ("http://✪df.ws/1234" . ("df.ws/1234"))
+       ("http://xn--df-oiy.ws/1234" . ("http://xn--df-oiy.ws/1234"))
+       ("Jackdaws love my big sphinx of quartz. Pack my box with five dozen liquor jugs." . nil)
+       ;; When multiple URLs appear, the found-urls list has them in reverse order from how they appear in the text.
+       ("The canonical placeholder domains are example.com and its .org and .net kin; you can point to any path within them (e.g. http://www.example.org/path/path/path), cf [RFC 2606](http://tools.ietf.org/html/rfc2606)" . ("http://tools.ietf.org/html/rfc2606" "http://www.example.org/path/path/path"))))))
