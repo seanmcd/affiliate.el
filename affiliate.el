@@ -93,10 +93,10 @@ returns URL unchanged."
   "Looks at the start of URL, matches it to a merchant."
   (cond
    ((string-match
-     "^\\(https?://\\)?\\((www\\.\\)?amazon\\.\\(com\\|ca\\|cn\\|fr\\|de\\|it\\|co\\.jp\\|es\\|co\\.uk\\)/"
+     "^\\(https?://\\)?\\(www\\.\\)?amazon\\.\\(com\\|ca\\|cn\\|fr\\|de\\|it\\|co\\.jp\\|es\\|co\\.uk\\)/"
      url) 'amazon)
    ((string-match
-     "^\\(\\(https?\\|itms\\|itms-apps\\)://\\)?\\((itunes\\|phobos\\)\\.apple\\.com/[a-z]\\{2\\}/"
+     "^\\(\\(https?\\|itms\\|itms-apps\\)://\\)?\\(itunes\\|phobos\\)\\.apple\\.com/[a-z]\\{2\\}/"
      url) 'itunes)
    ((string-match
      "^\\(https?://\\)?\\(www\\.\\)?appstore\\.com/"
@@ -150,7 +150,7 @@ URL, and when handed an amazon.com URL, will return an amazon.com URL."
   (string-match
    ;; Bug: won't match the http://amzn.com/$ASIN style of URL.
    (concat
-    "^\\(?:https?://\\)?\\((?:www\\.\\)?amazon\\.\\(com\\|ca\\|cn\\|fr\\|de\\|it\\|co\\.jp\\|es\\|co\\.uk\\)/"
+    "^\\(?:https?://\\)?\\(?:www\\.\\)?amazon\\.\\(com\\|ca\\|cn\\|fr\\|de\\|it\\|co\\.jp\\|es\\|co\\.uk\\)/"
     "\\(?:exec/obidos/tg/detail/-/\\|" ;; Amazon has used several
     "o/ASIN/\\|"                       ;; URL schemes over time.
     "[dg]p/\\(?:product/\\)?\\|"
@@ -183,7 +183,7 @@ The US iTunes Store operates its affiliate program through Rakuten LinkShare:
 other regions may operate through other affiliate programs. The iTunes-related
 functions may later be split into region-specific functions to reflect this."
   (string-match
-   (concat "^\\(?:\\(https?\\|itms\\|itms-apps\\)://\\)?\\((?:itunes\\|phobos\\)\\.apple\\.com/"
+   (concat "^\\(?:\\(https?\\|itms\\|itms-apps\\)://\\)?\\(?:itunes\\|phobos\\)\\.apple\\.com/"
            "\\([a-z]\\{2\\}\\)/" ;; country code
            "\\([a-z]+\\)/" ;; content type e.g. album, app, artist
            "[^/]+/" ;; human-readable content name

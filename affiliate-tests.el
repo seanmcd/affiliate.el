@@ -49,3 +49,12 @@
        ("Jackdaws love my big sphinx of quartz. Pack my box with five dozen liquor jugs." . nil)
        ;; When multiple URLs appear, the found-urls list has them in reverse order from how they appear in the text.
        ("The canonical placeholder domains are example.com and its .org and .net kin; you can point to any path within them (e.g. http://www.example.org/path/path/path), cf [RFC 2606](http://tools.ietf.org/html/rfc2606)" . ("http://tools.ietf.org/html/rfc2606" "http://www.example.org/path/path/path"))))))
+
+(ert-deftest aff-guess-merchant ()
+  "Tests whether `aff-guess-merchant' correctly identifies merchant in input."
+  (should (equal 'unknown
+                 (aff-guess-merchant "empty or not an URL")))
+  (should (equal 'itunes
+                 (aff-guess-merchant "http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8")))
+  (should (equal 'amazon
+                 (aff-guess-merchant "http://www.amazon.com/The-Emacs-Lisp-Reference-Manual/dp/188211440X"))))
