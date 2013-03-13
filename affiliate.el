@@ -187,7 +187,7 @@ The US iTunes Store operates its affiliate program through Rakuten LinkShare:
 other regions may operate through other affiliate programs. The iTunes-related
 functions may later be split into region-specific functions to reflect this."
   (if (string-match
-       (concat "^\\(?:\\(https?\\|itms\\|itms-apps\\)://\\)?"
+       (concat "^\\(?:\\(?:https?\\|itms\\|itms-apps\\)://\\)?"
                "\\(?:itunes\\|phobos\\)\\.apple\\.com/"
                "\\([a-z]\\{2\\}\\)/" ;; country code
                "\\([a-z]+\\)/" ;; content type e.g. album, app, artist

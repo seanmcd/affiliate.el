@@ -74,3 +74,12 @@
    ("http://www.amazon.com/dp/1435712757/ref=pd_sim_b_2" . '("1435712757" "com"))
    ("http://www.amazon.com/Practical-Common-Lisp-first-Text/dp/B004T91X0E/ref=tmm_hrd_title_2" . '("B004T91X0E" "com"))
    ("http://www.amazon.com/o/ASIN/B00746LVOM/ref=sr_1_1?ie=UTF8&qid=1349897747&sr=8-1&keywords=apple+ipad" . '("B00746LVOM" "com"))))
+
+(ert-deftest aff-dissect-itunes-url ()
+  "Tests whether function correctly identifies content-ids in iTunes URLs."
+  (aff-test-pairs
+   aff-dissect-itunes-url
+   ("http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8" . '("id284885288" "app" "us"))
+   ("http://itunes.apple.com/us/app/omnifocus-for-ipad/id383804552?mt=8" . '("id383804552" "app" "us"))
+   ("http://itunes.apple.com/us/app/fog-of-world/id505367096?mt=8&partnerId=30" . '("id505367096" "app" "us"))
+   ("https://itunes.apple.com/us/album/immersion-deluxe-version/id414575481" . '("id414575481" "album" "us"))))
