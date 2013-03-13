@@ -5,6 +5,13 @@
 (require 'ert)
 (require 'affiliate)
 
+(defmacro aff-test-pairs (fun-under-test &rest pairs)
+  `(progn
+     ,@(loop for pair in pairs
+             collecting  (let ((test-input (car pair))
+                               (expected-output (cdr pair)))
+                           `(should (equal (,fun-under-test ,test-input) ,expected-output))))))
+
 (ert-deftest aff-find-urls ()
   "Tests whether the function finds the relevant URLs in input."
   ;; Adapted from http://daringfireball.net/misc/2010/07/url-matching-regex-test-data.text
@@ -52,18 +59,18 @@
 
 (ert-deftest aff-guess-merchant ()
   "Tests whether `aff-guess-merchant' correctly identifies merchant in input."
-  (mapcar
-   (lambda (pair) (should (equal (cdr pair) (aff-guess-merchant (car pair)))))
-   '(("empty or not an URL" . unknown)
-     ("http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8" . itunes)
-     ("http://www.amazon.com/The-Emacs-Lisp-Reference-Manual/dp/188211440X" . amazon))))
+  (aff-test-pairs
+   aff-guess-merchant
+   ("empty or not an URL" . 'unknown)
+   ("http://itunes.apple.com/us/app/omnifocus-for-iphone/id284885288?mt=8" . 'itunes)
+   ("http://www.amazon.com/The-Emacs-Lisp-Reference-Manual/dp/188211440X" . 'amazon)))
 
-(ert-deftest aff-dissect-amazon-url-asin ()
-  "Tests whether function correctly identifies ASINs in URLs."
-  (mapcar
-   (lambda (pair) (should (equal (cdr pair) (car (aff-dissect-amazon-url (car pair))))))
-   '(("http://www.amazon.com/gp/product/006097625X" . "006097625X")
-     ("http://www.amazon.com/Lisp-Advanced-Techniques-Common/dp/0130305529/ref=sr_1_1?s=books&ie=UTF8&qid=1349897609&sr=1-1&keywords=on+lisp" . "0130305529")
-     ("http://www.amazon.com/dp/1435712757/ref=pd_sim_b_2" . "1435712757")
-     ("http://www.amazon.com/Practical-Common-Lisp-first-Text/dp/B004T91X0E/ref=tmm_hrd_title_2" . "B004T91X0E")
-     ("http://www.amazon.com/o/ASIN/B00746LVOM/ref=sr_1_1?ie=UTF8&qid=1349897747&sr=8-1&keywords=apple+ipad" . "B00746LVOM"))))
+(ert-deftest aff-dissect-amazon-url ()
+  "Tests whether function correctly identifies ASIN/domain in URLs."
+  (aff-test-pairs
+   aff-dissect-amazon-url
+   ("http://www.amazon.com/gp/product/006097625X" . '("006097625X" "com"))
+   ("http://www.amazon.com/Lisp-Advanced-Techniques-Common/dp/0130305529/ref=sr_1_1?s=books&ie=UTF8&qid=1349897609&sr=1-1&keywords=on+lisp" . '("0130305529" "com"))
+   ("http://www.amazon.com/dp/1435712757/ref=pd_sim_b_2" . '("1435712757" "com"))
+   ("http://www.amazon.com/Practical-Common-Lisp-first-Text/dp/B004T91X0E/ref=tmm_hrd_title_2" . '("B004T91X0E" "com"))
+   ("http://www.amazon.com/o/ASIN/B00746LVOM/ref=sr_1_1?ie=UTF8&qid=1349897747&sr=8-1&keywords=apple+ipad" . '("B00746LVOM" "com"))))
