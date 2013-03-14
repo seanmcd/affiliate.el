@@ -83,3 +83,20 @@
    ("http://itunes.apple.com/us/app/omnifocus-for-ipad/id383804552?mt=8" . '("id383804552" "app" "us"))
    ("http://itunes.apple.com/us/app/fog-of-world/id505367096?mt=8&partnerId=30" . '("id505367096" "app" "us"))
    ("https://itunes.apple.com/us/album/immersion-deluxe-version/id414575481" . '("id414575481" "album" "us"))))
+
+(ert-deftest aff-make-itunes-link ()
+  "Tests whether function correctly creates an iTunes affiliate link."
+  (flet
+      ((aff-dissect-itunes-url (url) url))
+    (let ((aff-itunes-id "the_test_id"))
+      (aff-test-pairs
+       aff-make-itunes-link
+       ('("id284885288" "app" "us") . "https://itunes.apple.com/us/app/id284885288?partnerId=30&siteID=the_test_id")
+       ('("id383804552" "app" "us") . "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id")
+       ('("id505367096" "app" "us") . "https://itunes.apple.com/us/app/id505367096?partnerId=30&siteID=the_test_id")
+       ('("id414575481" "album" "us") . "https://itunes.apple.com/us/album/id414575481?partnerId=30&siteID=the_test_id")))))
+
+(ert-deftest aff-make-itunes-link-idempotent ()
+  "Tests whether function has a fixed point that plays nice."
+  (let ((aff-itunes-id "the_test_id"))
+    (should (equal (aff-make-itunes-link (aff-make-itunes-link "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id")) "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id"))))

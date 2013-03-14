@@ -191,7 +191,7 @@ functions may later be split into region-specific functions to reflect this."
                "\\(?:itunes\\|phobos\\)\\.apple\\.com/"
                "\\([a-z]\\{2\\}\\)/" ;; country code
                "\\([a-z]+\\)/" ;; content type e.g. album, app, artist
-               "[^/]+/" ;; human-readable content name
+               "\\(?:[^/]+/\\)?" ;; human-readable content name, optional
                "\\(id[[:digit:]]+\\)" ;; content identifier
                "\\(.*?$\\)") ;; Possible trailing query-string gunk
        url)
