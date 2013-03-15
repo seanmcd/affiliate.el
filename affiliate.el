@@ -44,7 +44,10 @@ returns URL unchanged."
     (cond
      ((eq merchant 'amazon) (aff-make-amazon-link url))
      ((eq merchant 'itunes) (aff-make-itunes-link url))
-     ((eq merchant 'apple-appstore (aff-make-apple-appstore-link url)))
+     ((eq merchant 'apple-appstore
+          (aff-make-itunes-link (aff-dissect-apple-appstore-link url))))
+     ((eq merchant 'amazon-shorturl
+          (aff-make-amazon-link (aff-dissect-amazon-shorturl-link url))))
      (t (when aff-verbosity
           (message "Can't match the URL [%s] to a known affiliate program." url))
         url))))
@@ -105,6 +108,9 @@ is a bug."
    ((string-match
      "^\\(https?://\\)?\\(www\\.\\)?appstore\\.com/"
      url) 'apple-appstore)
+   ((string-match
+     "^\\(https?://\\)?\\(www\\.\\)?amzn\\.\\(com\\|to\\)/"
+     url) 'amazon-shorturl)
    (t 'unknown)))
 
 
@@ -129,9 +135,6 @@ is a bug."
     (format
      "https://itunes.apple.com/%s/%s/%s?partnerId=30&siteID=%s"
      country-id content-type content-id aff-itunes-id)))
-
-(defun aff-make-apple-appstore-link (url)
-  (error "Not yet implemented!"))
 
 
 (defun aff-dissect-amazon-url (url)
@@ -167,6 +170,9 @@ URL, and when handed an amazon.com URL, will return an amazon.com URL."
         (list asin country-tld))
     (when aff-verbosity
       (message "Couldn't process [%s] as an Amazon URL." url))))
+
+(defun aff-dissect-amazon-shorturl-url (url)
+  (error "Not yet implemented!"))
 
 (defun aff-dissect-itunes-url (url)
   "Retrives content, content-type, and country identifiers from URL.
