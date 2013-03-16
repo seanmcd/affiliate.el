@@ -73,7 +73,8 @@
    ("http://www.amazon.com/Lisp-Advanced-Techniques-Common/dp/0130305529/ref=sr_1_1?s=books&ie=UTF8&qid=1349897609&sr=1-1&keywords=on+lisp" . '("0130305529" "com"))
    ("http://www.amazon.com/dp/1435712757/ref=pd_sim_b_2" . '("1435712757" "com"))
    ("http://www.amazon.com/Practical-Common-Lisp-first-Text/dp/B004T91X0E/ref=tmm_hrd_title_2" . '("B004T91X0E" "com"))
-   ("http://www.amazon.com/o/ASIN/B00746LVOM/ref=sr_1_1?ie=UTF8&qid=1349897747&sr=8-1&keywords=apple+ipad" . '("B00746LVOM" "com"))))
+   ("http://www.amazon.com/o/ASIN/B00746LVOM/ref=sr_1_1?ie=UTF8&qid=1349897747&sr=8-1&keywords=apple+ipad" . '("B00746LVOM" "com"))
+   ("http://www.amazon.com/gp/product/006097625X/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=006097625X&linkCode=as2&tag=othercode-20" . '("006097625X" "com"))))
 
 (ert-deftest aff-dissect-itunes-url ()
   "Tests whether function correctly identifies content-ids in iTunes URLs."
@@ -83,6 +84,20 @@
    ("http://itunes.apple.com/us/app/omnifocus-for-ipad/id383804552?mt=8" . '("id383804552" "app" "us"))
    ("http://itunes.apple.com/us/app/fog-of-world/id505367096?mt=8&partnerId=30" . '("id505367096" "app" "us"))
    ("https://itunes.apple.com/us/album/immersion-deluxe-version/id414575481" . '("id414575481" "album" "us"))))
+
+(ert-deftest aff-make-amazon-link ()
+  "Tests whether function correctly creates an Amazon affiliate link."
+  (flet
+      ((aff-dissect-amazon-url (url) url))
+    (let ((aff-amazon-id "the_test_id"))
+      (aff-test-pairs
+       aff-make-amazon-link
+       ('("006097625X" "com")  . "https://www.amazon.com/gp/product/006097625X/?tag=the_test_id")
+       ('("0130305529" "com")  . "https://www.amazon.com/gp/product/0130305529/?tag=the_test_id")
+       ('("1435712757" "com")  . "https://www.amazon.com/gp/product/1435712757/?tag=the_test_id")
+       ('("B004T91X0E" "com")  . "https://www.amazon.com/gp/product/B004T91X0E/?tag=the_test_id")
+       ('("B00746LVOM" "com")  . "https://www.amazon.com/gp/product/B00746LVOM/?tag=the_test_id")
+       ('("006097625X" "com")  . "https://www.amazon.com/gp/product/006097625X/?tag=the_test_id")))))
 
 (ert-deftest aff-make-itunes-link ()
   "Tests whether function correctly creates an iTunes affiliate link."
@@ -99,4 +114,6 @@
 (ert-deftest aff-make-itunes-link-idempotent ()
   "Tests whether function has a fixed point that plays nice."
   (let ((aff-itunes-id "the_test_id"))
-    (should (equal (aff-make-itunes-link (aff-make-itunes-link "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id")) "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id"))))
+    (should
+     (equal (aff-make-itunes-link (aff-make-itunes-link "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id"))
+            "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id"))))

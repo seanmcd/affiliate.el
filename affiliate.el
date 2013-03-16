@@ -123,8 +123,8 @@ is a bug."
       (asin country-tld)
       (aff-dissect-amazon-url url)
     (format
-     "https://www.amazon.%s/dp/%s/"
-     country-tld asin)))
+     "https://www.amazon.%s/gp/product/%s/?tag=%s"
+     country-tld asin aff-amazon-id)))
 
 (defun aff-make-itunes-link (url)
   "Turn iTunes Store link URL into an affiliate-linked URL."
