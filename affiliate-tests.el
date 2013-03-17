@@ -89,31 +89,42 @@
   "Tests whether function correctly creates an Amazon affiliate link."
   (flet
       ((aff-dissect-amazon-url (url) url))
-    (let ((aff-amazon-id "the_test_id"))
+    (let ((aff-amazon-id "amazon_test_id"))
       (aff-test-pairs
        aff-make-amazon-link
-       ('("006097625X" "com")  . "https://www.amazon.com/gp/product/006097625X/?tag=the_test_id")
-       ('("0130305529" "com")  . "https://www.amazon.com/gp/product/0130305529/?tag=the_test_id")
-       ('("1435712757" "com")  . "https://www.amazon.com/gp/product/1435712757/?tag=the_test_id")
-       ('("B004T91X0E" "com")  . "https://www.amazon.com/gp/product/B004T91X0E/?tag=the_test_id")
-       ('("B00746LVOM" "com")  . "https://www.amazon.com/gp/product/B00746LVOM/?tag=the_test_id")
-       ('("006097625X" "com")  . "https://www.amazon.com/gp/product/006097625X/?tag=the_test_id")))))
+       ('("006097625X" "com")  . "https://www.amazon.com/gp/product/006097625X/?tag=amazon_test_id")
+       ('("0130305529" "com")  . "https://www.amazon.com/gp/product/0130305529/?tag=amazon_test_id")
+       ('("1435712757" "com")  . "https://www.amazon.com/gp/product/1435712757/?tag=amazon_test_id")
+       ('("B004T91X0E" "com")  . "https://www.amazon.com/gp/product/B004T91X0E/?tag=amazon_test_id")
+       ('("B00746LVOM" "com")  . "https://www.amazon.com/gp/product/B00746LVOM/?tag=amazon_test_id")
+       ('("006097625X" "com")  . "https://www.amazon.com/gp/product/006097625X/?tag=amazon_test_id")))))
 
 (ert-deftest aff-make-itunes-link ()
   "Tests whether function correctly creates an iTunes affiliate link."
   (flet
       ((aff-dissect-itunes-url (url) url))
-    (let ((aff-itunes-id "the_test_id"))
+    (let ((aff-itunes-id "itunes_test_id"))
       (aff-test-pairs
        aff-make-itunes-link
-       ('("id284885288" "app" "us") . "https://itunes.apple.com/us/app/id284885288?partnerId=30&siteID=the_test_id")
-       ('("id383804552" "app" "us") . "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id")
-       ('("id505367096" "app" "us") . "https://itunes.apple.com/us/app/id505367096?partnerId=30&siteID=the_test_id")
-       ('("id414575481" "album" "us") . "https://itunes.apple.com/us/album/id414575481?partnerId=30&siteID=the_test_id")))))
+       ('("id284885288" "app" "us") . "https://itunes.apple.com/us/app/id284885288?partnerId=30&siteID=itunes_test_id")
+       ('("id383804552" "app" "us") . "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=itunes_test_id")
+       ('("id505367096" "app" "us") . "https://itunes.apple.com/us/app/id505367096?partnerId=30&siteID=itunes_test_id")
+       ('("id414575481" "album" "us") . "https://itunes.apple.com/us/album/id414575481?partnerId=30&siteID=itunes_test_id")))))
 
 (ert-deftest aff-make-itunes-link-idempotent ()
   "Tests whether function has a fixed point that plays nice."
-  (let ((aff-itunes-id "the_test_id"))
+  (let ((aff-itunes-id "itunes_test_id"))
     (should
-     (equal (aff-make-itunes-link (aff-make-itunes-link "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id"))
-            "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=the_test_id"))))
+     (equal (aff-make-itunes-link (aff-make-itunes-link "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=itunes_test_id"))
+            "https://itunes.apple.com/us/app/id383804552?partnerId=30&siteID=itunes_test_id"))))
+
+(ert-deftest aff-transform-url ()
+  "Tests that the function plays nice when the functions it calls play nice."
+  (let ((aff-itunes-id "itunes_test_id")
+        (aff-amazon-id "amazon_test_id"))
+    (aff-test-pairs
+     aff-transform-url
+     ("http://www.amazon.com/Metabarons-Ultimate-Collection-Alexandro-Jodorowsky/dp/1594650640" .
+      (aff-make-amazon-link "http://www.amazon.com/Metabarons-Ultimate-Collection-Alexandro-Jodorowsky/dp/1594650640"))
+     ("https://itunes.apple.com/us/app/id284885288?partnerId=30&siteID=itunes_test_id" .
+      (aff-make-itunes-link "https://itunes.apple.com/us/app/id284885288?partnerId=30&siteID=itunes_test_id")))))

@@ -40,19 +40,23 @@ Returns the new version of URL if and only if we can positively identify which
 merchant it matches and generate a well-formed affiliate link. Otherwise,
 returns URL unchanged."
   (interactive "sURL to add affiliate code to: ")
-  (let ((merchant (or merchant (aff-guess-merchant url))))
-    (cond
-     ((eq merchant 'amazon) (aff-make-amazon-link url))
-     ((eq merchant 'itunes) (aff-make-itunes-link url))
-     ((eq merchant 'apple-appstore
-          (aff-make-itunes-link (aff-dissect-apple-appstore-link url))))
-     ((eq merchant 'amazon-shorturl
-          (aff-make-amazon-link (aff-dissect-amazon-shorturl-link url))))
-     (t (when aff-verbosity
-          (message "Can't match the URL [%s] to a known affiliate program." url))
-        url))))
+  (let* ((merchant (or merchant (aff-guess-merchant url)))
+         (new-url
+          (cond
+           ((eq merchant 'amazon) (aff-make-amazon-link url))
+           ((eq merchant 'itunes) (aff-make-itunes-link url))
+           ((eq merchant 'apple-appstore)
+            (aff-make-itunes-link (aff-dissect-apple-appstore-link url)))
+           ((eq merchant 'amazon-shorturl)
+            (aff-make-amazon-link (aff-dissect-amazon-shorturl-link url)))
+           (t (when aff-verbosity
+                (message "Can't match the URL [%s] to a known affiliate program." url))
+              url))))
+    (when (called-interactively-p 'any)
+      (message "New url: [%s]." new-url))
+    new-url))
 
-(defun aff-replace-urls-in-region (start end)
+(Defun aff-replace-urls-in-region (start end)
   "Scans for URLs between START and END, sends them to `aff-transform-url'.
 
 Called interactively, operates on the region. Called from lisp, operates on the
