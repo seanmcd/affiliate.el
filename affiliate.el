@@ -27,6 +27,11 @@ programs."
   :type 'boolean
   :group 'affiliate)
 
+(defmacro aff-message (str &rest rest)
+  "A code-compression macro for only messaging when `aff-verbosity' is not nil."
+  `(when aff-verbosity
+     (message ,str ,@rest)))
+
 
 ;; Interactive functions; user-facing, stable.
 (defun aff-transform-url (url &optional merchant)
@@ -50,10 +55,10 @@ returns URL unchanged."
            ((eq merchant 'amazon-shorturl)
             (aff-make-amazon-link (aff-dissect-amazon-shorturl-link url)))
            (t (when aff-verbosity
-                (message "Can't match the URL [%s] to a known affiliate program." url))
+                (aff-message "Can't match the URL [%s] to a known affiliate program." url))
               url))))
     (when (called-interactively-p 'any)
-      (message "New url: [%s]." new-url))
+      (aff-message "New url: [%s]." new-url))
     new-url))
 
 (defun aff-replace-urls-in-region (start end)
@@ -177,7 +182,7 @@ URL, and when handed an amazon.com URL, will return an amazon.com URL."
             (asin (match-string 2 url)))
         (list asin country-tld))
     (when aff-verbosity
-      (message "Couldn't process [%s] as an Amazon URL." url))))
+      (aff-message "Couldn't process [%s] as an Amazon URL." url))))
 
 (defun aff-dissect-amazon-shorturl-url (url)
   (error "Not yet implemented!"))
@@ -214,10 +219,10 @@ functions may later be split into region-specific functions to reflect this."
              (country-id (match-string 1 url))
              (detritus (match-string 4 url)))
         (when aff-verbosity
-          (message "Found trailing detritus in query string: [%s]" detritus))
+          (aff-message "Found trailing detritus in query string: [%s]" detritus))
         (list content-id content-type country-id))
     (when aff-verbosity
-      (message "Couldn't process [%s] as an iTunes Store URL." url))))
+      (aff-message "Couldn't process [%s] as an iTunes Store URL." url))))
 
 (defun aff-dissect-apple-appstore-url (url)
   (error "Not yet implemented!"))
