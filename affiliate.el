@@ -56,7 +56,7 @@ returns URL unchanged."
       (message "New url: [%s]." new-url))
     new-url))
 
-(Defun aff-replace-urls-in-region (start end)
+(defun aff-replace-urls-in-region (start end)
   "Scans for URLs between START and END, sends them to `aff-transform-url'.
 
 Called interactively, operates on the region. Called from lisp, operates on the
