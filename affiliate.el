@@ -90,8 +90,12 @@ is a bug."
       found-url-list)))
 
 (defun aff-replace-urls-in-buffer (&optional target-buffer)
-  ;; call aff-replace-urls-in-region but just use point-min and point-max for args.
-  ;; if BUFFER is provided, do the fiddling-about in that buffer, otherwise, current.
+  "Applies `aff-replace-urls-in-region' to TARGET-BUFFER.
+
+TARGET-BUFFER defaults to the current buffer when no value is provided or when
+this function is called interactively.  It is a simple wrapper around
+`aff-replace-urls-in-region' that takes a buffer as an argument instead of a
+region, and acts on the entire buffer."
   (interactive "bAdd affiliate code to URLs in this buffer: ")
   (save-excursion
     (when target-buffer
